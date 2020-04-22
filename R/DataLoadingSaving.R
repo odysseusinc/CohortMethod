@@ -196,10 +196,12 @@ getDbCohortMethodData <- function(connectionDetails,
   }
 
   ParallelLogger::logInfo("\nConstructing target and comparator cohorts")
+  sessionId <- SqlRender::generateSessionId()
   renderedSql <- SqlRender::loadRenderTranslateSql("CreateCohorts.sql",
                                                    packageName = "CohortMethod",
                                                    dbms = connectionDetails$dbms,
                                                    oracleTempSchema = oracleTempSchema,
+                                                   sessionId = sessionId,
                                                    cdm_database_schema = cdmDatabaseSchema,
                                                    exposure_database_schema = exposureDatabaseSchema,
                                                    exposure_table = exposureTable,
@@ -220,6 +222,7 @@ getDbCohortMethodData <- function(connectionDetails,
                                                      packageName = "CohortMethod",
                                                      dbms = connectionDetails$dbms,
                                                      oracleTempSchema = oracleTempSchema,
+                                                     sessionId = sessionId,
                                                      cdm_version = cdmVersion,
                                                      target_id = targetId)
     counts <- DatabaseConnector::querySql(connection, renderedSql)
@@ -256,6 +259,7 @@ getDbCohortMethodData <- function(connectionDetails,
                                                        packageName = "CohortMethod",
                                                        dbms = connectionDetails$dbms,
                                                        oracleTempSchema = oracleTempSchema,
+                                                       sessionId = sessionId,
                                                        cdm_version = cdmVersion,
                                                        max_cohort_size = maxCohortSize)
       DatabaseConnector::executeSql(connection, renderedSql)
@@ -268,6 +272,7 @@ getDbCohortMethodData <- function(connectionDetails,
                                                  packageName = "CohortMethod",
                                                  dbms = connectionDetails$dbms,
                                                  oracleTempSchema = oracleTempSchema,
+                                                 sessionId = sessionId,
                                                  cdm_version = cdmVersion,
                                                  target_id = targetId,
                                                  sampled = sampled)
@@ -290,6 +295,7 @@ getDbCohortMethodData <- function(connectionDetails,
                                                      packageName = "CohortMethod",
                                                      dbms = connectionDetails$dbms,
                                                      oracleTempSchema = oracleTempSchema,
+                                                     sessionId = sessionId,
                                                      cdm_database_schema = cdmDatabaseSchema,
                                                      exposure_database_schema = exposureDatabaseSchema,
                                                      exposure_table = tolower(exposureTable),
@@ -359,6 +365,7 @@ getDbCohortMethodData <- function(connectionDetails,
   }
   covariateData <- FeatureExtraction::getDbCovariateData(connection = connection,
                                                          oracleTempSchema = oracleTempSchema,
+                                                         sessionId = sessionId,
                                                          cdmDatabaseSchema = cdmDatabaseSchema,
                                                          cdmVersion = cdmVersion,
                                                          cohortTable = cohortTable,
@@ -372,6 +379,7 @@ getDbCohortMethodData <- function(connectionDetails,
                                                   packageName = "CohortMethod",
                                                   dbms = connectionDetails$dbms,
                                                   oracleTempSchema = oracleTempSchema,
+                                                  sessionId = sessionId,
                                                   cdm_database_schema = cdmDatabaseSchema,
                                                   outcome_database_schema = outcomeDatabaseSchema,
                                                   outcome_table = outcomeTable,
@@ -385,12 +393,12 @@ getDbCohortMethodData <- function(connectionDetails,
   delta <- Sys.time() - start
   ParallelLogger::logInfo(paste("Fetching outcomes took", signif(delta, 3), attr(delta, "units")))
   ParallelLogger::logDebug("Fetched outcomes total count is ", nrow(outcomes))
-
   # Remove temp tables:
   renderedSql <- SqlRender::loadRenderTranslateSql("RemoveCohortTempTables.sql",
                                                    packageName = "CohortMethod",
                                                    dbms = connectionDetails$dbms,
                                                    oracleTempSchema = oracleTempSchema,
+                                                   sessionId = sessionId,
                                                    sampled = sampled)
   DatabaseConnector::executeSql(connection,
                                 renderedSql,
