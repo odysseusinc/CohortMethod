@@ -197,6 +197,8 @@ getDbCohortMethodData <- function(connectionDetails,
 
   ParallelLogger::logInfo("\nConstructing target and comparator cohorts")
   sessionId <- SqlRender::generateSessionId()
+  print("new sessionId")
+  print(sessionId)
   renderedSql <- SqlRender::loadRenderTranslateSql("CreateCohorts.sql",
                                                    packageName = "CohortMethod",
                                                    dbms = connectionDetails$dbms,
